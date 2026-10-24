@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # repo root, so `config`, `models`, ... import
 import argparse
 from pathlib import Path
 
@@ -5,6 +9,7 @@ import matplotlib.pyplot as plt
 import pennylane as qml
 import torch
 
+from config import ROOT
 from models.circuit import build_circuit
 
 
@@ -53,7 +58,7 @@ def draw_and_save(output_path: Path, n_qubits: int = 4, vqc_layers: int = 3, dpi
 
 def main():
     parser = argparse.ArgumentParser(description="Draw QSHIELD-FL VQC topology to image.")
-    parser.add_argument("--output", default="qshield_vqc.png", help="Output image filename/path.")
+    parser.add_argument("--output", default=str(ROOT / "docs" / "qshield_vqc.png"), help="Output image filename/path.")
     parser.add_argument("--n_qubits", type=int, default=4, help="Qubit count (project default: 4).")
     parser.add_argument("--vqc_layers", type=int, default=3, help="VQC layer count (project default: 3).")
     parser.add_argument("--dpi", type=int, default=300, help="Output image DPI.")

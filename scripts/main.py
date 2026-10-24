@@ -1,3 +1,7 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # repo root, so `config`, `models`, ... import
 import json
 import os
 from datetime import datetime
