@@ -8,6 +8,8 @@ from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from config import DATA_DIR
+
 
 NSL_KDD_COLUMNS = [
     "duration", "protocol_type", "service", "flag",
@@ -190,12 +192,13 @@ def get_binary_tabular_loaders(
     num_clients=3,
     batch_size=64,
     dataset="breast_cancer",
-    data_dir="data/nsl_kdd",
+    data_dir=None,
     seed=42,
     split="iid",
     dirichlet_alpha=0.5,
     use_20_percent=False
 ):
+    data_dir = str(DATA_DIR) if data_dir is None else str(data_dir)
     if dataset == "breast_cancer":
         X_train, y_train, X_test, y_test = _load_breast_cancer(seed=seed)
     elif dataset == "nsl_kdd":

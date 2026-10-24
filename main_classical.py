@@ -11,11 +11,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
 
+from config import DATA_DIR, ROOT
 from data.loader import get_binary_tabular_loaders
 from models.classical_baselines import BaselineSpec, get_all_baselines
-
-
-ROOT = Path(__file__).resolve().parent
 
 
 def parse_args():
@@ -23,7 +21,7 @@ def parse_args():
         description="Run lightweight classical baselines for QSHIELD-FL comparison."
     )
     parser.add_argument("--dataset", type=str, default="nsl_kdd", choices=["nsl_kdd", "breast_cancer"])
-    parser.add_argument("--data_dir", type=str, default="data/nsl_kdd")
+    parser.add_argument("--data_dir", type=str, default=str(DATA_DIR))
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--num_clients", type=int, default=3)
