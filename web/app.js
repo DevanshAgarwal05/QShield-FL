@@ -73,8 +73,9 @@ function clearGlobalMessage() {
 }
 
 function prettyLabel(lbl) {
-  if (lbl === "Class 0") return "Normal";
-  if (lbl === "Class 1") return "Attack";
+  // Loader convention: 0 = Attack, 1 = Normal.
+  if (lbl === "Class 0") return "Attack";
+  if (lbl === "Class 1") return "Normal";
   return lbl || "—";
 }
 
