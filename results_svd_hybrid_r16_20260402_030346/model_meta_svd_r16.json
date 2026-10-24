@@ -1,0 +1,8 @@
+{
+  "path_type": "svd_hybrid_qnn",
+  "svd_enabled": true,
+  "svd_rank": 16,
+  "model_in_dim_after_svd": 16,
+  "threshold": 0.5,
+  "saved_at": "2026-04-02T03:03:47.279025"
+}

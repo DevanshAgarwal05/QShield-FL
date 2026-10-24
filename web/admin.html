@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>QSHIELD-FL Admin</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="appShell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brandLogo">Q</div>
+        <div class="brandText">
+          <div class="brandTitle">QSHIELD-FL</div>
+          <div class="brandSub">IDS Demo</div>
+        </div>
+      </div>
+
+      <div class="sidebarBlock">
+        <div class="sidebarLabel">Views</div>
+        <nav class="nav">
+          <button class="navItem active" data-view="viewOverview"><span class="dot"></span> Overview</button>
+          <button class="navItem" data-view="viewAnalytics"><span class="dot"></span> Analytics</button>
+          <button class="navItem" data-view="viewInference"><span class="dot"></span> Inference</button>
+        </nav>
+      </div>
+
+      <div class="legendCard">
+        <div class="legendTitle">Scenarios</div>
+        <div class="legendRow"><span class="scenarioBadge clean">Clean</span><span class="legendText">No attack</span></div>
+        <div class="legendRow"><span class="scenarioBadge attack">Attack</span><span class="legendText">SignFlip</span></div>
+        <div class="legendRow"><span class="scenarioBadge defended">Defended</span><span class="legendText">Trimmed mean</span></div>
+        <div class="legendRow"><span class="scenarioBadge defendedDp">Defended + DP</span><span class="legendText">Defense + DP</span></div>
+      </div>
+
+      <div class="sidebarBlock sidebarNotes">
+        <div class="sidebarLabel">Focus</div>
+        <div class="sidebarText" id="sidebarPrimaryNote">
+          Final path: SVD-hybrid r16.
+        </div>
+      </div>
+
+      <div class="sidebarFooter">
+        <div class="kv"><div class="k">Status</div><div class="v"><span class="pill" id="statusPill">Idle</span></div></div>
+        <div class="kv"><div class="k">Selected Run</div><div class="v" id="selectedMini">—</div></div>
+        <div class="kv"><div class="k">Loaded Model</div><div class="v" id="loadedMini">—</div></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbarLeft">
+          <div class="topbarEyebrow">QSHIELD-FL</div>
+          <div class="pageTitle" id="pageTitle">Overview</div>
+          <div class="pageHint" id="pageHint">Runs, metrics, charts</div>
+        </div>
+        <div class="topbarRight">
+          <button class="btn ghost" id="refreshBtn">Refresh</button>
+        </div>
+      </header>
+
+      <div id="globalMessage" class="globalMessage" style="display:none;"></div>
+
+      <section class="heroPanel">
+        <div class="heroCopy">
+          <div class="heroKicker">Quantum Federated IDS</div>
+          <h1 class="heroTitle">Results Dashboard</h1>
+          <div class="heroChips">
+            <span class="chip strong">Real data</span>
+            <span class="chip">Backend unchanged</span>
+            <span class="chip">Inference kept</span>
+          </div>
+        </div>
+        <div class="heroFocus">
+          <div class="focusLabel">Primary Path</div>
+          <div class="focusValue" id="primaryPathHeadline">SVD-hybrid rank-16</div>
+          <div class="focusMeta" id="primaryPathMeta">Waiting for runs...</div>
+          <div class="focusNote" id="primaryPathNote">Preferred run from current artifacts.</div>
+        </div>
+      </section>
+
+      <section class="summaryGrid summaryGridWide">
+        <div class="summaryCard summaryCardAccent">
+          <div class="summaryLabel">Active Run</div>
+          <div class="summaryValue" id="activeRunName">None selected</div>
+          <div class="summaryMeta" id="activeRunUpdated">Updated: —</div>
+        </div>
+        <div class="summaryCard">
+          <div class="summaryLabel">Active Model Path</div>
+          <div class="summaryValue" id="activeRunType">—</div>
+          <div class="summaryMeta" id="activeRunNotes">Waiting for run data</div>
+        </div>
+        <div class="summaryCard">
+          <div class="summaryLabel">Scenarios</div>
+          <div class="summaryBadges" id="scenarioAvailability">
+            <span class="scenarioBadge neutral">No run</span>
+          </div>
+          <div class="summaryMeta" id="scenarioAvailabilityMeta">From CSV files in the run</div>
+        </div>
+        <div class="summaryCard">
+          <div class="summaryLabel">Loaded Model</div>
+          <div class="summaryValue" id="loadedModelHeadline">No model loaded</div>
+          <div class="summaryMeta" id="loadedModelMeta">Load from Inference</div>
+        </div>
+      </section>
+
+      <section id="viewOverview" class="view active">
+        <div class="dashboardStack">
+          <div class="card">
+            <div class="cardHead">
+              <div>
+                <div class="cardTitle">Selected Run Summary</div>
+                <div class="cardSub">Scenario finals</div>
+              </div>
+            </div>
+            <div id="overviewMetricCards" class="metricCardGrid">
+              <div class="emptyState">
+                <div class="emptyTitle">No run selected</div>
+                <div class="emptySub">Pick a run.</div>
+              </div>
+            </div>
+            <div id="overviewMetricChart" class="chartPanel compactPanel"></div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Scenario Comparison</div>
+                  <div class="cardSub" id="scenarioCompareSub">Selected vs baseline</div>
+                </div>
+              </div>
+              <div id="scenarioCompareBody">
+                <div class="emptyState">
+                  <div class="emptyTitle">No comparison yet</div>
+                  <div class="emptySub">Load a run with curves.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Highlights</div>
+                  <div class="cardSub">Short notes from current data</div>
+                </div>
+              </div>
+              <div id="findingsBody">
+                <div class="emptyState">
+                  <div class="emptyTitle">No highlights yet</div>
+                  <div class="emptySub">Pick a run.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">SVD Rank View</div>
+                  <div class="cardSub">r16 / r24 / r32 from saved CSVs</div>
+                </div>
+              </div>
+              <div id="rankStoryBody">
+                <div class="emptyState">
+                  <div class="emptyTitle">No rank data</div>
+                  <div class="emptySub">No SVD runs found.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Classical Baselines</div>
+                  <div class="cardSub">Only saved summary files</div>
+                </div>
+              </div>
+              <div id="classicalCompareBody">
+                <div class="emptyState">
+                  <div class="emptyTitle">No classical data</div>
+                  <div class="emptySub">No readable summaries.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Result Folders</div>
+                  <div class="cardSub">Select active run</div>
+                </div>
+                <span class="chip" id="foldersCount">0</span>
+              </div>
+              <div id="folderList" class="list">
+                <div class="emptyState">
+                  <div class="emptyTitle">No folders loaded yet</div>
+                  <div class="emptySub">Click refresh.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Model Artifacts</div>
+                  <div class="cardSub" id="selectedFolderText">Pick a run to inspect files</div>
+                </div>
+                <span class="chip" id="filesCount">0</span>
+              </div>
+              <div id="fileList" class="list">
+                <div class="emptyState">
+                  <div class="emptyTitle">No folder selected</div>
+                  <div class="emptySub">Pick a run.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="viewAnalytics" class="view">
+        <div class="dashboardStack">
+          <div class="card">
+            <div class="cardHead">
+              <div>
+                <div class="cardTitle">Scenario Curves</div>
+                <div class="cardSub" id="analyticsSub">Pick a run first</div>
+              </div>
+              <div class="summaryBadges">
+                <span class="scenarioBadge clean" id="finalClean">Clean: —</span>
+                <span class="scenarioBadge attack" id="finalAttack">Attack: —</span>
+                <span class="scenarioBadge defended" id="finalDef">Defended: —</span>
+                <span class="scenarioBadge defendedDp" id="finalDP">Defended + DP: —</span>
+              </div>
+            </div>
+
+            <div class="toolbarRow">
+              <span class="toolbarLabel">Visible series</span>
+              <button class="btn tiny ghost" id="toggleClean">Clean</button>
+              <button class="btn tiny ghost" id="toggleAttack">Attack</button>
+              <button class="btn tiny ghost" id="toggleDefended">Defended</button>
+              <button class="btn tiny ghost" id="toggleDP">Defended + DP</button>
+              <span class="toolbarHint">Hover for values</span>
+            </div>
+
+            <div class="canvasWrap">
+              <canvas id="curveCanvas" height="380" class="canvas"></canvas>
+              <div id="chartTip" class="chartTip" style="display:none;"></div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Model Comparison Within Run</div>
+                  <div class="cardSub">Existing compare endpoint</div>
+                </div>
+              </div>
+
+              <div class="toolbarRow">
+                <button class="btn ghost" id="compareBtn">Compare 200</button>
+                <button class="btn ghost" id="compareBtnSmall">Compare 50</button>
+                <span class="pill" id="comparePill">—</span>
+              </div>
+
+              <div id="compareBarChart" class="chartPanel compactPanel"></div>
+              <div id="compareSummary" class="inlineNote">
+                No compare run yet.
+              </div>
+              <div id="compareOut" class="resultBox" style="display:none;"></div>
+            </div>
+
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Run Snapshot</div>
+                  <div class="cardSub">Files, curves, checkpoints</div>
+                </div>
+              </div>
+              <div id="runSnapshotBody">
+                <div class="emptyState">
+                  <div class="emptyTitle">No run snapshot</div>
+                  <div class="emptySub">Pick a run.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="viewInference" class="view">
+        <div class="dashboardStack">
+          <div class="grid2">
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Loaded Model Status</div>
+                  <div class="cardSub">Current checkpoint state</div>
+                </div>
+              </div>
+
+              <div class="statusGrid">
+                <div class="statusItem"><div class="k">Loaded</div><div class="v"><span class="pill danger" id="modelPill">Not Loaded</span></div></div>
+                <div class="statusItem"><div class="k">in_dim</div><div class="v"><span class="pill" id="inDimPill">?</span></div></div>
+                <div class="statusItem"><div class="k">threshold</div><div class="v"><span class="pill" id="thresholdPill">?</span></div></div>
+              </div>
+
+              <div class="detailGrid">
+                <div class="detailItem"><div class="detailLabel">Folder</div><div class="detailValue" id="loadedFolderValue">—</div></div>
+                <div class="detailItem"><div class="detailLabel">Model file</div><div class="detailValue" id="loadedModelValue">—</div></div>
+                <div class="detailItem"><div class="detailLabel">Type</div><div class="detailValue" id="loadedTypeValue">—</div></div>
+                <div class="detailItem"><div class="detailLabel">Meta source</div><div class="detailValue" id="loadedMetaValue">—</div></div>
+              </div>
+
+              <div class="toolbarRow">
+                <button class="btn" id="checkModelBtn">Check Model Status</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="cardTitle sectionMiniTitle">Checkpoint Loader</div>
+              <div class="cardSub">Load `model_*.pt` from the run</div>
+
+              <div class="toolbarRow">
+                <select id="modelSelect" class="select"></select>
+                <button class="btn ghost" id="loadSelectedModelBtn">Load Selected</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="cardTitle sectionMiniTitle">Random Test Sample</div>
+              <div class="cardSub">NSL-KDD sample from API</div>
+
+              <div class="toolbarRow">
+                <button class="btn ghost" id="randAnyBtn">Random Any</button>
+                <button class="btn ghost" id="randNormalBtn">Random Normal</button>
+                <button class="btn ghost" id="randAttackBtn">Random Attack</button>
+                <span class="pill" id="truthPill">truth: ?</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="cardHead">
+                <div>
+                  <div class="cardTitle">Prediction Workspace</div>
+                  <div class="cardSub">Vector must match current input size</div>
+                </div>
+              </div>
+
+              <label class="label">Feature vector</label>
+              <textarea id="featureInput" class="textarea" rows="8"></textarea>
+
+              <div class="toolbarRow">
+                <button class="btn" id="predictBtn">Run Prediction</button>
+                <button class="btn ghost" id="clearBtn">Clear</button>
+              </div>
+
+              <div id="predictOut" class="resultBox" style="display:none;"></div>
+
+              <div class="divider"></div>
+
+              <div class="cardTitle sectionMiniTitle">Batch Evaluation</div>
+              <div class="cardSub">50 random samples + confusion matrix</div>
+
+              <div class="toolbarRow">
+                <button class="btn ghost" id="batchAnyBtn">Batch 50 (Any)</button>
+                <button class="btn ghost" id="batchNormalBtn">Batch 50 (Normal)</button>
+                <button class="btn ghost" id="batchAttackBtn">Batch 50 (Attack)</button>
+              </div>
+
+              <div id="batchOut" class="resultBox" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>QSHIELD-FL dashboard • frontend only</span>
+      </footer>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

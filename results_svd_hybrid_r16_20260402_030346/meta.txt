@@ -1,0 +1,35 @@
+SVD-HQFL Run
+timestamp: 2026-04-02T03:03:46.581669
+path_type: svd_hybrid_qnn
+dataset: nsl_kdd
+data_dir: data/nsl_kdd
+use_20_percent: True
+split: iid
+device: cpu
+
+svd:
+  enabled: True
+  rank: 16
+  fit_scope: per_experiment_global_train_concat
+
+qnn:
+  n_qubits: 4
+  vqc_layers: 3
+
+training:
+  rounds: 10
+  local_epochs: 2
+  local_lr: 0.003
+  batch_size: 256
+
+attack:
+  malicious_client: 0
+  attack_scale: 5.0
+
+defense:
+  n_def_clients: 9
+  trim_ratio: 0.25
+
+dp:
+  dp_sigma: 0.003
+  dp_start_round: 8

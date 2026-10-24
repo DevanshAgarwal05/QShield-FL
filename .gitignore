@@ -1,0 +1,9 @@
+﻿venv/
+__pycache__/
+*.pyc
+data/nsl_kdd/
+_legacy_backup/
+Papers_2/
+results_*/
+!results_svd_hybrid_r16_20260402_030346/
+.env
