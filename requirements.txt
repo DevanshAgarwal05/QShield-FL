@@ -1,0 +1,12 @@
+# Runtime dependencies (versions from the project venv).
+# torch was installed as 2.5.1+cu121; the code runs on CPU, so any 2.5.x build works.
+torch==2.5.1
+pennylane==0.44.0
+pennylane-lightning==0.44.0
+numpy==2.4.2
+pandas==3.0.0
+scikit-learn==1.8.0
+matplotlib==3.10.8
+openpyxl==3.1.5
+fastapi==0.129.0
+uvicorn==0.40.0
