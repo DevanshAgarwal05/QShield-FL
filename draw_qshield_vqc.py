@@ -5,37 +5,16 @@ import matplotlib.pyplot as plt
 import pennylane as qml
 import torch
 
+from models.circuit import build_circuit
+
 
 def build_qnode(n_qubits: int = 4, vqc_layers: int = 3):
-    """Build the exact VQC topology used in hybrid_qnn.py/hybrid_svd_qnn.py."""
+    """Same circuit the models use (models/circuit.py)."""
     try:
-        dev = qml.device("lightning.qubit", wires=n_qubits)
+        return build_circuit(n_qubits, vqc_layers, device_name="lightning.qubit")
     except Exception:
-        # Fallback only for drawing in environments without lightning plugin.
-        dev = qml.device("default.qubit", wires=n_qubits)
-
-    @qml.qnode(dev, interface="torch", diff_method="adjoint")
-    def circuit(x, weights):
-        # Exact embedding from project models.
-        qml.AngleEmbedding(x, wires=range(n_qubits), rotation="Y")
-
-        # Exact variational and entanglement pattern from project models.
-        for l in range(vqc_layers):
-            for i in range(n_qubits):
-                qml.Rot(
-                    weights[l, i, 0],
-                    weights[l, i, 1],
-                    weights[l, i, 2],
-                    wires=i,
-                )
-
-            for i in range(n_qubits):
-                qml.CNOT(wires=[i, (i + 1) % n_qubits])
-
-        # Exact readout structure from project models.
-        return [qml.expval(qml.PauliZ(i)) for i in range(n_qubits)]
-
-    return circuit
+        # Fallback only for drawing in environments without the lightning plugin.
+        return build_circuit(n_qubits, vqc_layers, device_name="default.qubit")
 
 
 def draw_and_save(output_path: Path, n_qubits: int = 4, vqc_layers: int = 3, dpi: int = 300):
@@ -67,8 +46,7 @@ def draw_and_save(output_path: Path, n_qubits: int = 4, vqc_layers: int = 3, dpi
     fig.savefig(output_path, dpi=dpi, bbox_inches="tight")
     plt.close(fig)
 
-    print("Circuit matched from: models/hybrid_qnn.py::HybridQNN.__init__->circuit and")
-    print("                      models/hybrid_svd_qnn.py::HybridSVDQNN.__init__->circuit")
+    print("Circuit drawn from: models/circuit.py::build_circuit")
     print(f"Image created: {output_path.name}")
     print(f"Saved at: {output_path.resolve()}")
 

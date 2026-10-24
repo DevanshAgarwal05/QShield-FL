@@ -15,7 +15,7 @@ from federated.aggregation import fedavg, trimmed_mean
 from federated.attacks import sign_flip
 from federated.client import apply_update, get_update, train_one_client
 from federated.privacy import add_dp_noise
-from models.hybrid_svd_qnn import HybridSVDQNN
+from models.hybrid_qnn import HybridQNN
 
 try:
     import matplotlib.pyplot as plt
@@ -152,14 +152,14 @@ def run_experiment(
         f"lr={local_lr}, attack={use_attack}, defense={use_defense}, dp={use_dp}"
     )
 
-    global_model = HybridSVDQNN(
+    global_model = HybridQNN(
         in_dim=in_dim,
         n_qubits=n_qubits,
         vqc_layers=vqc_layers,
     ).to(device)
     global_state = deepcopy(global_model.state_dict())
     client_models = [
-        HybridSVDQNN(in_dim=in_dim, n_qubits=n_qubits, vqc_layers=vqc_layers).to(device)
+        HybridQNN(in_dim=in_dim, n_qubits=n_qubits, vqc_layers=vqc_layers).to(device)
         for _ in range(num_clients)
     ]
 
